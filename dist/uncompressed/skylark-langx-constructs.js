@@ -96,11 +96,28 @@ define('skylark-langx-constructs/inherit',[
 	"./constructs"
 ],function(constructs){
 
-    function inherit(ctor, base) {
-        var f = function() {};
-        f.prototype = base.prototype;
+    function inherit(ctor,base) {
+        ///var f = function() {};
+        ///f.prototype = base.prototype;
+        ///
+        ///ctor.prototype = new f();
 
-        ctor.prototype = new f();
+	    if ((typeof base !== "function") && base) {
+	      throw new TypeError("Super expression must either be null or a function");
+	    }
+
+	    ctor.prototype = Object.create(base && base.prototype, {
+	      constructor: {
+	        value: ctor,
+	        writable: true,
+	        configurable: true
+	      }
+	    });
+
+	    if (base) {
+	    	//tor.__proto__ = base;
+	    	Object.setPrototypeOf(ctor, base);
+	    } 
     }
 
     return constructs.inherit = inherit
@@ -258,8 +275,10 @@ let longEar = klass({
             var newCtor =ctor;
             for (var i=0;i<mixins.length;i++) {
                 var xtor = new Function();
-                xtor.prototype = Object.create(newCtor.prototype);
-                xtor.__proto__ = newCtor;
+
+                inherit(xtor,newCtor)
+                //xtor.prototype = Object.create(newCtor.prototype);
+                //xtor.__proto__ = newCtor;
                 xtor.superclass = null;
                 mixin(xtor.prototype,mixins[i].prototype);
                 xtor.prototype.__mixin__ = mixins[i];
@@ -314,15 +333,17 @@ let longEar = klass({
 
 
             // Populate our constructed prototype object
-            ctor.prototype = Object.create(innerParent.prototype);
+            ///ctor.prototype = Object.create(innerParent.prototype);
 
             // Enforce the constructor to be what we expect
-            ctor.prototype.constructor = ctor;
-            ctor.superclass = parent;
-
+            ///ctor.prototype.constructor = ctor;
+  
             // And make this class extendable
-            ctor.__proto__ = innerParent;
+            ///ctor.__proto__ = innerParent;
 
+            inherit(ctor,innerParent);
+
+            ctor.superclass = parent;
 
             if (!ctor._constructor) {
                 ctor._constructor = _constructor;
