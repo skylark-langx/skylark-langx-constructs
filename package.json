@@ -21,7 +21,8 @@
   "license": "MIT",
   "bugs": "https://github.com/skylark-langx/skylark-langx/issues",
   "exports": {
-    "./": "./dist/uncompressed/skylark-langx-constructs/"
+    ".": "./dist/uncompressed/skylark-langx-constructs/main.js",
+    "./*": "./dist/uncompressed/skylark-langx-constructs/*.js"
   },
   "dependencies": {
     "skylark-langx-arrays": "git+https://github.com/skylark-langx/skylark-langx-arrays.git",
